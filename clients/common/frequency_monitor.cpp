@@ -58,6 +58,7 @@ inline std::string concatenate(Ts&&... vals)
     return msg.str();
 }
 
+//rsmi_status_t e = (expr);                                                                 \
 #define HIP_CHECK_EXC(expr)                                                                       \
     do                                                                                            \
     {                                                                                             \
@@ -78,7 +79,7 @@ inline std::string concatenate(Ts&&... vals)
 #define RSMI_CHECK_EXC(expr)                                                                      \
     do                                                                                            \
     {                                                                                             \
-        rsmi_status_t e = (expr);                                                                 \
+        amdsmi_status_t e = (expr);                                                                 \
         if(e)                                                                                     \
         {                                                                                         \
             const char* errName = nullptr;                                                        \
@@ -312,8 +313,10 @@ private:
         {
 #if rocm_smi_VERSION_MAJOR >= 7
             // multi_XCD
-            rsmi_gpu_metrics_t gpuMetrics;
-            auto status1 = rsmi_dev_gpu_metrics_info_get(m_smiDeviceIndex, &gpuMetrics);
+            //rsmi_gpu_metrics_t gpuMetrics;
+            //auto status1 = rsmi_dev_gpu_metrics_info_get(m_smiDeviceIndex, &gpuMetrics);
+			
+            //auto status1 = amdsmi_get_gpu_metrics_info(amdsmi_processor_handle processor_handle, amdsmi_gpu_metrics_t *pgpu_metrics);			
             if(status1 == RSMI_STATUS_SUCCESS)
             {
                 for(int i = 0; i < m_XCDCount; i++)
@@ -379,13 +382,16 @@ private:
 
     void InitROCmSMI()
     {
-        static rsmi_status_t status = rsmi_init(0);
-        RSMI_CHECK_EXC(status);
+        //static rsmi_status_t status = rsmi_init(0);
+		//RSMI_CHECK_EXC(status);
+		static rsmi_status_t status = amdsmi_init(amdsmi_get_socket_handles());
+		RSMI_CHECK_EXC(status);
     }
 
     uint32_t GetROCmSMIIndex(int hipDeviceIndex)
     {
         InitROCmSMI();
+		
 
         hipDeviceProp_t props;
 
